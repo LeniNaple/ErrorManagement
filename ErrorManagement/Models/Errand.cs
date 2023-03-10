@@ -9,18 +9,31 @@ namespace ErrorManagement.Models;
 public class Errand
 {
 
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public string ErrorMessage { get; set; } = null!;
 
-    public string Status { get; set; } = null!;
+    public int Status { get; set; } 
 
     public string LogTime { get; set; } = null!;
 
 
+    // Connected to... customer...
+
+    public string Name { get; set; } = null!;
+
+    public string Email { get; set; } = null!;
+
+    public string? PhoneNumber { get; set; }
+
+
+
 
     // Connected to... comment... 
-    // Connected to... customer...
+
+    // public string Response { get; set; } = null!;
+
+    // public string ResponseTime { get; set; } = null!;
 
 
 

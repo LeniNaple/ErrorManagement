@@ -1,4 +1,4 @@
-﻿using ErrorManagement.System;
+﻿using ErrorManagement.Services;
 
 MainMenu mainMenu = new MainMenu();
 

@@ -1,13 +1,12 @@
 ﻿using ErrorManagement.Models;
-using System.Collections;
-using System.Linq;
+using ErrorManagement.Models.Entities;
 
-namespace ErrorManagement.System;
+namespace ErrorManagement.Services;
 
 internal class MainMenu
 {
 
-    public List<Customer> Customers = new List<Customer>();
+    public List<Errand> Errands = new List<Errand>();
 
     public void Menu()
     {
@@ -18,10 +17,10 @@ internal class MainMenu
         WelcomeMenu();
 
     }
-        
 
 
-    private void WelcomeMenu() 
+
+    private void WelcomeMenu()
     {
         Console.WriteLine("Welcome to Error handling system, console version!");
         Console.WriteLine("Are you a customer, press 1");
@@ -42,7 +41,7 @@ internal class MainMenu
             default:
                 Console.Clear();
                 Console.WriteLine("You have entered an invalid choice. Please try again.");
-                Console.ReadKey(); 
+                Console.ReadKey();
                 break;
         }
     }
@@ -118,24 +117,26 @@ internal class MainMenu
 
     private void LogError() //Save to database instead
     {
-        Customer customer = new Customer();
+        Errand errand = new Errand();
 
         Console.WriteLine("Here lies create function...");
         Console.WriteLine("You have chosen to let us know of an error. Follow the following steps:");
         Console.WriteLine("Enter your name: ");
-        customer.Name = Console.ReadLine() ?? "";
+        errand.Name = Console.ReadLine() ?? "";
         Console.WriteLine("Enter your email: ");
-        customer.Email = Console.ReadLine() ?? "";
+        errand.Email = Console.ReadLine() ?? "";
         Console.WriteLine("Enter your phonenumber (optional): ");
-        customer.PhoneNumber = Console.ReadLine() ?? "";
+        errand.PhoneNumber = Console.ReadLine() ?? "";
 
         //SHOULD SAVE TO COMMENT, AND NOT TO CUSTOMER... 
         Console.WriteLine("What is the error that has occured ");
-        customer.Comment = Console.ReadLine() ?? "";
+        errand.ErrorMessage = Console.ReadLine() ?? "";
 
+
+        errand.Status = 1;
         // Create a logged time of the errand
         // Set status of errand to "Ej påbörjad"
-        Customers.Add(customer);
+        Errands.Add(errand);
         Console.WriteLine("Your errand have been logged, we will be in touch.");
         Console.ReadKey();
     }
@@ -144,26 +145,42 @@ internal class MainMenu
     {
         Console.WriteLine("Here lies view all function... (Not very detailed)");
         Console.ReadKey();
-        
-        if (Customers.Count == 0)
+
+        if (Errands.Count == 0)
         {
             Console.WriteLine("There aint a single errand here!!!");
             Console.WriteLine("");
             Console.ReadKey();
-        } 
-        else 
+        }
+        else
         {
             Console.WriteLine("Here are all errands: ");
             Console.WriteLine("");
             int nr = 0;
-            foreach (Customer customer in Customers)
+            foreach (Errand errand in Errands)
             {
                 nr++;
-                Console.WriteLine($"Comment number {nr}: {customer.Email} {customer.PhoneNumber}");
-                Console.WriteLine($"Name: {customer.Name}");
-                Console.WriteLine($"Contact information: {customer.Email} {customer.PhoneNumber}");
+                Console.WriteLine($"Comment number {nr}: {errand.Email} {errand.PhoneNumber}");
+                Console.WriteLine($"Name: {errand.Name}");
+                Console.WriteLine($"Contact information: {errand.Email} {errand.PhoneNumber}");
+
+                if (errand.Status == 1)
+                {
+                    Console.WriteLine("This error doesnt have a handler yet!");
+                }
+                else if (errand.Status == 2)
+                {
+                    Console.WriteLine("This error is ongoing!");
+                }
+                else
+                {
+                    Console.WriteLine("This error is finished.");
+                }
+
                 Console.WriteLine("");
+
             }
+
             Console.ReadKey();
         }
 
@@ -179,7 +196,7 @@ internal class MainMenu
     {
         Console.WriteLine("Here lies change status & comment function...");
         Console.ReadKey();
-        
+
         Console.WriteLine("1. Do you want to change status of a specific errand?");
         Console.WriteLine("2. Do you want add a comment on a specific errand?");
         Console.ReadLine();
@@ -188,6 +205,10 @@ internal class MainMenu
 
 
     }
+
+
+
+  
 
 
 }
