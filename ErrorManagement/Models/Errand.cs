@@ -15,7 +15,7 @@ public class Errand
 
     public int Status { get; set; } 
 
-    public string LogTime { get; set; } = null!;
+    public DateTime LogTime { get; set; }
 
 
     // Connected to... customer...

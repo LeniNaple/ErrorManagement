@@ -1,5 +1,6 @@
 ﻿using ErrorManagement.Models;
 using ErrorManagement.Models.Entities;
+using Microsoft.Identity.Client;
 
 namespace ErrorManagement.Services;
 
@@ -60,7 +61,7 @@ internal class MainMenu
         {
 
             case "1":
-                LogError();
+                LogErrorAsync();
                 break;
 
             case "2":
@@ -68,7 +69,7 @@ internal class MainMenu
                 break;
 
             case "3":
-                ViewAllErrors();
+                ViewAllErrorsAsync();
                 break;
 
             default:
@@ -94,7 +95,7 @@ internal class MainMenu
         {
 
             case "1":
-                ViewAllErrors();
+                ViewAllErrorsAsync();
                 break;
 
             case "2":
@@ -115,66 +116,60 @@ internal class MainMenu
     }
 
 
-    private void LogError() //Save to database instead
+    private async void LogErrorAsync() //Works, but need to add timestamp properly...
     {
         Errand errand = new Errand();
 
-        Console.WriteLine("Here lies create function...");
-        Console.WriteLine("You have chosen to let us know of an error. Follow the following steps:");
+        Console.WriteLine("You have chosen to let us know of an error:");
         Console.WriteLine("Enter your name: ");
         errand.Name = Console.ReadLine() ?? "";
+
         Console.WriteLine("Enter your email: ");
         errand.Email = Console.ReadLine() ?? "";
+
         Console.WriteLine("Enter your phonenumber (optional): ");
         errand.PhoneNumber = Console.ReadLine() ?? "";
 
-        //SHOULD SAVE TO COMMENT, AND NOT TO CUSTOMER... 
         Console.WriteLine("What is the error that has occured ");
         errand.ErrorMessage = Console.ReadLine() ?? "";
 
-
-        errand.Status = 1;
-        // Create a logged time of the errand
         // Set status of errand to "Ej påbörjad"
-        Errands.Add(errand);
+        errand.Status = 1;
+
+        await CustomerService.SaveAsync(errand);
         Console.WriteLine("Your errand have been logged, we will be in touch.");
         Console.ReadKey();
     }
 
-    private void ViewAllErrors() //Load from database instead
+    private async void ViewAllErrorsAsync() //Load from database instead
     {
-        Console.WriteLine("Here lies view all function... (Not very detailed)");
-        Console.ReadKey();
+        var errands = await CustomerService.GetAllAsync();
 
-        if (Errands.Count == 0)
-        {
-            Console.WriteLine("There aint a single errand here!!!");
-            Console.WriteLine("");
-            Console.ReadKey();
-        }
-        else
+        if (errands.Any())
         {
             Console.WriteLine("Here are all errands: ");
             Console.WriteLine("");
             int nr = 0;
-            foreach (Errand errand in Errands)
+            foreach (Errand errand in errands)
             {
                 nr++;
-                Console.WriteLine($"Comment number {nr}: {errand.Email} {errand.PhoneNumber}");
+                Console.WriteLine($"Comment number: {nr}. ");
                 Console.WriteLine($"Name: {errand.Name}");
-                Console.WriteLine($"Contact information: {errand.Email} {errand.PhoneNumber}");
+                Console.WriteLine($"Handling number: {errand.Id}");
+                Console.WriteLine($"Contact information: {errand.Email} PN: {errand.PhoneNumber}");
+
 
                 if (errand.Status == 1)
                 {
-                    Console.WriteLine("This error doesnt have a handler yet!");
+                    Console.WriteLine("ERRAND STATUS: - Not yet assigned to handler.");
                 }
                 else if (errand.Status == 2)
                 {
-                    Console.WriteLine("This error is ongoing!");
+                    Console.WriteLine("ERRAND STATUS: - Ongoing!");
                 }
                 else
                 {
-                    Console.WriteLine("This error is finished.");
+                    Console.WriteLine("ERRAND STATUS: - Finished!");
                 }
 
                 Console.WriteLine("");
@@ -182,6 +177,13 @@ internal class MainMenu
             }
 
             Console.ReadKey();
+        }
+        else
+        {
+            Console.WriteLine("There aint a single errand here!!!");
+            Console.WriteLine("");
+            Console.ReadKey();
+
         }
 
     }
@@ -201,10 +203,8 @@ internal class MainMenu
         Console.WriteLine("2. Do you want add a comment on a specific errand?");
         Console.ReadLine();
 
-
-
-
     }
+
 
 
 
