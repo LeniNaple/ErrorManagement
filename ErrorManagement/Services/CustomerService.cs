@@ -86,7 +86,7 @@ internal class CustomerService
         {
             if (!string.IsNullOrEmpty(errand.ErrorMessage))
                 _errand.ErrorMessage = errand.ErrorMessage;
-                _errand.Status = errand.Status;
+            _errand.Status = errand.Status;
 
             if (!string.IsNullOrEmpty(errand.Name) || !string.IsNullOrEmpty(errand.Email))
             {
@@ -119,6 +119,8 @@ internal class CustomerService
             _context.Remove(_errand);
             await _context.SaveChangesAsync();
         }
+        await _context.SaveChangesAsync();
     }
 
+    
 }
