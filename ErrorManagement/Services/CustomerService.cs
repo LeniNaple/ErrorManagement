@@ -56,9 +56,9 @@ internal class CustomerService
         return _errands;
     }
 
-    public static async Task<Errand> GetAsync(Errand errand)
+    public static async Task<Errand> GetAsync(Guid errandNumber)
     {
-        var _errand = await _context.Errands.Include(x => x.Customer).FirstOrDefaultAsync(x => x.Id == errand.Id);
+        var _errand = await _context.Errands.Include(x => x.Customer).FirstOrDefaultAsync(x => x.Id == errandNumber);
         if (_errand != null)
         {
             return new Errand()

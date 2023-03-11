@@ -141,7 +141,7 @@ internal class MainMenu
         Console.ReadKey();
     }
 
-    private async void ViewAllErrorsAsync() //Load from database instead
+    private async void ViewAllErrorsAsync() //Needs working timestamp
     {
         var errands = await CustomerService.GetAllAsync();
 
@@ -190,8 +190,23 @@ internal class MainMenu
 
     private void ViewErrorDetails()
     {
-        Console.WriteLine("Here lies search function... (View one)");
-        Console.ReadKey();
+        Console.WriteLine("Write errand number to view specific errand: ");
+        var errandNumber = Console.ReadLine();
+
+        if (!string .IsNullOrEmpty(errandNumber))
+        {
+            Guid errandNr = Guid.Parse(errandNumber);
+
+
+
+        } else
+        {
+            Console.WriteLine("Not a valid entry.");
+            Console.ReadKey();
+        }
+ 
+
+        
     }
 
     private void ChangeError()
