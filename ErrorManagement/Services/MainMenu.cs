@@ -1,27 +1,29 @@
-﻿using ErrorManagement.Models;
+﻿using ErrorManagement.Contexts;
+using ErrorManagement.Models;
 using ErrorManagement.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 
 namespace ErrorManagement.Services;
 
 internal class MainMenu
 {
-
+    private static DataContext _context = new DataContext();
     public List<Errand> Errands = new List<Errand>();
 
-    public void Menu()
+    public async Task Menu()
     {
 
         //Populate list from database
 
         Console.Clear();
-        WelcomeMenu();
+        await WelcomeMenu();
 
     }
 
 
 
-    private void WelcomeMenu()
+    private async Task WelcomeMenu()
     {
         Console.WriteLine("Welcome to Error handling system, console version!");
         Console.WriteLine("Are you a customer, press 1");
@@ -32,11 +34,11 @@ internal class MainMenu
         {
 
             case "1":
-                CustomerChoice();
+                await CustomerChoice();
                 break;
 
             case "2":
-                EmployeeChoice();
+                await EmployeeChoice();
                 break;
 
             default:
@@ -48,7 +50,7 @@ internal class MainMenu
     }
 
 
-    private void CustomerChoice()
+    private async Task CustomerChoice()
     {
         Console.Clear();
         Console.WriteLine("Welcome customer!");
@@ -61,15 +63,18 @@ internal class MainMenu
         {
 
             case "1":
-                LogErrorAsync();
+                await LogErrorAsync();
+                Console.ReadKey();
                 break;
 
             case "2":
-                ViewErrorDetails();
+                await ViewErrorDetails();
+                Console.ReadKey();
                 break;
 
             case "3":
-                ViewAllErrorsAsync();
+                await ViewAllErrorsAsync();
+                Console.ReadKey();
                 break;
 
             default:
@@ -82,28 +87,34 @@ internal class MainMenu
     }
 
 
-    private void EmployeeChoice()
+    private async Task EmployeeChoice()
     {
         Console.Clear();
         Console.WriteLine("Welcome employee!");
-        Console.WriteLine("Press 1 to view all errands.");
-        Console.WriteLine("Press 2 to view details on one errand.");
-        Console.WriteLine("Press 3 to finalize or comment an errand.");
+        Console.WriteLine("1: to view all errands.");
+        Console.WriteLine("2: to view details on one errand.");
+        Console.WriteLine("3: to change status on an errand.");
+        Console.WriteLine("4: to delete an errand from database.");
+
         var choice = Console.ReadLine();
 
         switch (choice)
         {
 
             case "1":
-                ViewAllErrorsAsync();
+                await ViewAllErrorsAsync();
                 break;
 
             case "2":
-                ViewErrorDetails();
+                await ViewErrorDetails();
                 break;
 
             case "3":
                 ChangeError();
+                break;
+
+            case "4":
+                await DeleteError();
                 break;
 
             default:
@@ -116,7 +127,7 @@ internal class MainMenu
     }
 
 
-    private async void LogErrorAsync() //Works, but need to add timestamp properly...
+    private async Task LogErrorAsync() //Seems functional, saves new errand to database... 
     {
         Errand errand = new Errand();
 
@@ -135,13 +146,14 @@ internal class MainMenu
 
         // Set status of errand to "Ej påbörjad"
         errand.Status = 1;
+        errand.LogTime = DateTime.Now;
 
         await CustomerService.SaveAsync(errand);
         Console.WriteLine("Your errand have been logged, we will be in touch.");
         Console.ReadKey();
     }
 
-    private async void ViewAllErrorsAsync() //Needs working timestamp
+    private async Task ViewAllErrorsAsync() //Seems functional, loads all errands from database, and displays them...
     {
         var errands = await CustomerService.GetAllAsync();
 
@@ -188,15 +200,37 @@ internal class MainMenu
 
     }
 
-    private void ViewErrorDetails()
+    private async Task ViewErrorDetails() //(NEEDS VISUAL UPDATE) It is functional, but veeeery slow in loading an errand..
     {
         Console.WriteLine("Write errand number to view specific errand: ");
         var errandNumber = Console.ReadLine();
 
         if (!string .IsNullOrEmpty(errandNumber))
         {
-            Guid errandNr = Guid.Parse(errandNumber);
 
+            try
+            {
+                Guid errandNr = Guid.Parse(errandNumber);
+                var _errand = await CustomerService.GetAsync(errandNr);
+                if (_errand != null)
+                {
+                    Console.WriteLine($"Customer number {_errand.Id}");
+                    Console.WriteLine($"Customer {_errand.Name}");
+                    Console.WriteLine($"Error {_errand.ErrorMessage}");
+                    Console.ReadKey();
+
+                }
+                else
+                {
+                    Console.WriteLine("No customer with this errand number");
+                    Console.ReadKey();
+                }
+            } 
+            catch
+            {
+                Console.WriteLine("Not a valid entry.");
+                Console.ReadKey();
+            }
 
 
         } else
@@ -220,10 +254,38 @@ internal class MainMenu
 
     }
 
+    private async Task DeleteError()
+    {
+        Console.WriteLine("Write the errand number of the errand you want to delete: ");
+        var errandNr = Console.ReadLine();
+
+        if (!string.IsNullOrEmpty(errandNr))
+        {
+
+            try
+            {
+                Guid errandNumber = Guid.Parse(errandNr);
+                await CustomerService.DeleteAsync(errandNumber);
+                Console.WriteLine("Errand has been deleted!");
+                Console.ReadKey();
+            }
+            catch
+            {
+                Console.WriteLine("Not a valid entry.");
+                Console.ReadKey();
+            }
+
+        }
+        else
+        {
+            Console.WriteLine("Not a valid entry.");
+            Console.ReadKey();
+        }
+        Console.ReadKey();
+    }
 
 
 
-  
 
 
 }

@@ -111,9 +111,9 @@ internal class CustomerService
     }
 
 
-    public static async Task DeleteAsync(Errand errand)
+    public static async Task DeleteAsync(Guid errandNumber)
     {
-        var _errand = await _context.Errands.Include(x => x.Customer).FirstOrDefaultAsync(x => x.Id == errand.Id);
+        var _errand = await _context.Errands.Include(x => x.Customer).FirstOrDefaultAsync(x => x.Id == errandNumber);
         if (_errand != null)
         {
             _context.Remove(_errand);
